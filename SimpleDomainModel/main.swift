@@ -49,8 +49,12 @@ public struct Money {
     return Money(amount: Int(amount), currency: to.currency)
   }
     
-  public func subtract(from: Money) -> Money {
-    return currency
+  public mutating func subtract(from: Money) -> Money {
+    if (currency != from.currency) {
+        let converted: Money = convert(from.currency)
+        amount = converted.amount
+    }
+    return Money(amount: Int(from.amount - amount), currency: from.currency)
   }
 }
 
@@ -161,8 +165,20 @@ public class Family {
     }
   
   public func householdIncome() -> Int {
-    
+    var total: Double = 0
+    for index in 0...members.count {
+        let _job = members[index].job as Job?
+        if _job != nil {
+            switch _job!.type {
+                case .Hourly(let value):
+                    total += (value * 52 * 40)
+                case .Salary(let value):
+                    total += Double(value)
+            }
+        }
     }
+    return Int(total)
+  }
 }
 
 
